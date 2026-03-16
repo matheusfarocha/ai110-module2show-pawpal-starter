@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List
+from datetime import date, timedelta
 
 
 PRIORITY_ORDER = {"high": 0, "medium": 1, "low": 2}
@@ -11,11 +12,27 @@ class Task:
     duration_minutes: int
     priority: str          # "low", "medium", "high"
     frequency: str = "daily"  # "daily", "weekly", "as needed"
+    scheduled_time: str = ""  # "HH:MM" format, e.g. "08:30"
+    due_date: date = field(default_factory=date.today)
     completed: bool = False
 
     def mark_complete(self) -> None:
         """Mark this task as completed."""
         self.completed = True
+
+    def next_occurrence(self) -> "Task":
+        """Return a fresh copy of this task with due_date advanced by frequency interval."""
+        delta = {"daily": timedelta(days=1), "weekly": timedelta(weeks=1)}
+        next_due = self.due_date + delta.get(self.frequency, timedelta(days=0))
+        return Task(
+            title=self.title,
+            duration_minutes=self.duration_minutes,
+            priority=self.priority,
+            frequency=self.frequency,
+            scheduled_time=self.scheduled_time,
+            due_date=next_due,
+            completed=False,
+        )
 
 
 @dataclass
@@ -70,6 +87,42 @@ class Scheduler:
                 time_used += task.duration_minutes
 
         return schedule
+
+    def complete_task(self, task: Task, pet: Pet) -> None:
+        """Mark a task complete and schedule the next occurrence if it recurs."""
+        task.mark_complete()
+        if task.frequency in ("daily", "weekly"):
+            pet.add_task(task.next_occurrence())
+
+    def detect_conflicts(self) -> List[str]:
+        """Return warning messages for any tasks that share the same scheduled_time."""
+        schedule = self.generate_schedule()
+        timed = [t for t in schedule if t.scheduled_time]
+        warnings = []
+        for i, a in enumerate(timed):
+            for b in timed[i + 1:]:
+                if a.scheduled_time == b.scheduled_time:
+                    warnings.append(
+                        f"WARNING: '{a.title}' and '{b.title}' are both scheduled at {a.scheduled_time}."
+                    )
+        return warnings
+
+    def filter_tasks(self, completed: bool = None, pet_name: str = None) -> List[Task]:
+        """Return tasks filtered by completion status and/or pet name."""
+        results = []
+        for pet in self.owner.pets:
+            if pet_name and pet.name.lower() != pet_name.lower():
+                continue
+            for task in pet.get_tasks():
+                if completed is not None and task.completed != completed:
+                    continue
+                results.append(task)
+        return results
+
+    def sort_by_time(self) -> List[Task]:
+        """Sort scheduled tasks by their scheduled_time (HH:MM), putting unscheduled tasks last."""
+        schedule = self.generate_schedule()
+        return sorted(schedule, key=lambda t: t.scheduled_time if t.scheduled_time else "99:99")
 
     def explain_plan(self) -> str:
         """Return a human-readable explanation of the generated schedule."""

@@ -16,7 +16,7 @@ The initial design included four classes:
 
 **b. Design changes**
 
-Yes. The initial AI-generated UML included `preferences` and `set_available_time` on `Owner`, and a `needs` list with `get_needs()` on `Pet`. These were removed because `needs` was redundant with `Task`, and `preferences` was too vague to be useful without knowing how the scheduler would actually use it. `is_high_priority()` was also removed from `Task` since priority can be checked directly without a dedicated method.
+The initial AI-generated UML included `preferences` and `set_available_time` on `Owner`, and a `needs` list with `get_needs()` on `Pet`. These were removed because `needs` was redundant with `Task`, and `preferences` was too vague to be useful without knowing how the scheduler would actually use it. `is_high_priority()` was also removed from `Task` since priority can be checked directly without a dedicated method.
 
 ---
 
@@ -29,8 +29,7 @@ Yes. The initial AI-generated UML included `preferences` and `set_available_time
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+The conflict detector compares `scheduled_time` strings directly instead of parsing them into time objects. This means it returns human-readable warning messages rather than raising exceptions. The tradeoff is that it won't catch overlapping time ranges (e.g. a 30-min task at 08:00 overlapping a task at 08:15) — it only flags exact time matches. For a daily pet care planner, this is reasonable since tasks are loosely scheduled and an exact-match warning is enough to prompt the user to adjust.
 
 ---
 

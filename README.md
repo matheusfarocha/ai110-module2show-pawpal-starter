@@ -32,6 +32,15 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+## Smarter Scheduling
+
+The `Scheduler` class includes three features beyond basic priority-based scheduling:
+
+- **`sort_by_time()`** — sorts the generated schedule by `scheduled_time` (HH:MM strings) so tasks appear in chronological order. Tasks without a time fall to the end.
+- **`filter_tasks(completed, pet_name)`** — filters tasks by completion status and/or pet name. Both parameters are optional and can be combined.
+- **`detect_conflicts()`** — scans the schedule for tasks sharing the same `scheduled_time` and returns human-readable warning strings instead of raising exceptions.
+- **`complete_task(task, pet)`** — marks a task done and automatically adds the next occurrence to the pet's task list if the frequency is `"daily"` or `"weekly"`, using Python's `timedelta` to advance the due date.
+
 ### Suggested workflow
 
 1. Read the scenario carefully and identify requirements and edge cases.
