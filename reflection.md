@@ -1,16 +1,22 @@
 # PawPal+ Project Reflection
 
 ## 1. System Design
-
+- add pet
+- schedule walk
+- see today's tasks
+- request task recomendations
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+The initial design included four classes:
+
+- **Owner** — holds the owner's name and the total time available for pet care in a day. Responsible for managing which pets belong to the owner.
+- **Pet** — holds basic info about the pet: name, species, and age. Has no behavior of its own; it exists to give the scheduler context about who is being cared for.
+- **Task** — a dataclass representing a single care activity (e.g., walk, feeding, grooming). Stores the title, duration in minutes, priority level, category, and an optional reason explaining why the task matters.
+- **Scheduler** — the core logic class. It holds a reference to the owner and pet, maintains a list of tasks, and is responsible for generating a daily schedule based on available time and task priority, as well as explaining the plan.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Yes. The initial AI-generated UML included `preferences` and `set_available_time` on `Owner`, and a `needs` list with `get_needs()` on `Pet`. These were removed because `needs` was redundant with `Task`, and `preferences` was too vague to be useful without knowing how the scheduler would actually use it. `is_high_priority()` was also removed from `Task` since priority can be checked directly without a dedicated method.
 
 ---
 
