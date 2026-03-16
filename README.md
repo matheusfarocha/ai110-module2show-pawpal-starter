@@ -32,6 +32,29 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+## Testing PawPal+
+
+Run the test suite with:
+
+```bash
+source .venv/bin/activate
+python -m pytest tests/test_pawpal.py -v
+```
+
+**What the tests cover:**
+
+- Task completion — verifying `mark_complete()` changes status to `True`
+- Task addition — verifying `add_task()` increases a pet's task count
+- Sorting correctness — verifying `sort_by_time()` returns tasks in chronological order
+- Recurrence logic — verifying that completing a daily task creates a new task due the following day
+- Conflict detection — verifying that two tasks at the same time produce a warning message
+
+**Confidence level: ★★★★☆**
+
+Core scheduling behaviors are well covered. The main gap is edge cases around empty states (no pets, no tasks, full time budget) and the UI layer, which has no automated tests.
+
+---
+
 ## Smarter Scheduling
 
 The `Scheduler` class includes three features beyond basic priority-based scheduling:
